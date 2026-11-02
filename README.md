@@ -84,6 +84,21 @@ The current simulation produced the following baseline results:
 - **Formal covariance calibration:** Consistent with the empirical Monte Carlo results.
 
 Additional tests examined the effects of measurement noise, reference satellite selection, observation duration, satellite count, emitter position, assumed altitude error, and carrier-frequency mismatch.
+##Results and Analysis
+Module 10 – Accuracy and Residual Analysis
+The localization solver achieved a horizontal positioning error of approximately 8.3 metres in the simulated scenario using nine measurement epochs.
+
+The residual analysis produced a chi-square per degree of freedom of 0.99, indicating consistency with the assumed measurement noise model. The solver also demonstrated improved convergence when additional measurement epochs were included, with the success rate increasing from 52% for one epoch to 93% for nine epochs across 69 initial guesses.
+
+These results demonstrate the benefit of accumulating measurements over time, although some sensitivity to initial guesses remains.
+Module 11 – Monte Carlo and Robustness Testing
+Monte Carlo simulations were conducted using 100 trials per test configuration to evaluate the system under different measurement noise levels, satellite geometries, reference satellite selections, and emitter locations.
+
+The analysis examined four main aspects:
+- Measurement noise: Localization error generally increased as TDOA and FDOA noise levels increased.
+- Covariance calibration: Compared empirical localization errors with the uncertainty predicted by the solver to evaluate uncertainty estimation.
+- Altitude sensitivity: Incorrect assumptions about emitter altitude affected horizontal localization accuracy.
+- Carrier frequency sensitivity: Carrier frequency mismatch influenced FDOA predictions and consequently affected localization performance.
 
 These results demonstrate the performance of the implemented localization framework under the simulated conditions and assumptions.
 
