@@ -2,39 +2,39 @@
 
 ## Overview
 
-This project develops a MATLAB-based simulation framework for satellite-based Radio Frequency (RF) emitter localization using Time Difference of Arrival (TDOA) and Frequency Difference of Arrival (FDOA) techniques.
+This project focuses on developing a MATLAB-based simulation framework for locating ground-based Radio Frequency (RF) emitters using satellite observations. It uses Time Difference of Arrival (TDOA) and Frequency Difference of Arrival (FDOA) techniques to estimate the geographical position of an unknown emitter.
 
-The framework integrates Systems Tool Kit (STK) with MATLAB to simulate satellite orbital motion, determine common satellite visibility, extract satellite states, generate synthetic TDOA/FDOA measurements, and estimate the geographical location of a ground-based RF emitter.
+The framework combines Systems Tool Kit (STK) 11 with MATLAB R2023b to model satellite orbits, identify periods of common satellite visibility, extract satellite position and velocity data, and generate synthetic TDOA/FDOA measurements. These measurements are then used by a localization algorithm to estimate the emitter's latitude and longitude.
 
-The project consists of 11 modules, covering the complete workflow from scenario initialization and satellite configuration to localization, accuracy assessment, and Monte Carlo robustness testing.
+The project is divided into 11 modules, covering the workflow from satellite scenario development and measurement generation to localization, accuracy assessment, and robustness testing.
 
 ## Objectives
 
-- Develop a satellite-based RF emitter localization simulation framework.
-- Integrate STK 11 with MATLAB R2023b for satellite scenario modelling and data extraction.
+- Develop a simulation framework for satellite-based RF emitter localization.
+- Integrate STK 11 with MATLAB R2023b for satellite modelling and data extraction.
 - Simulate multiple satellites observing a common ground location.
-- Generate synthetic TDOA and FDOA measurements from satellite-emitter geometry.
-- Implement a cumulative localization algorithm to estimate emitter latitude and longitude.
-- Evaluate localization accuracy, residuals, convergence, and uncertainty.
-- Assess system robustness under different measurement noise levels, satellite configurations, observation durations, and model uncertainties.
+- Generate synthetic TDOA and FDOA measurements using satellite-emitter geometry.
+- Develop a cumulative localization algorithm to estimate emitter latitude and longitude.
+- Examine localization accuracy, measurement residuals, convergence, and uncertainty.
+- Evaluate system performance under different measurement noise levels, satellite configurations, observation durations, and model uncertainties.
 
 ## Methodology and Project Workflow
 
-The project is organized into the following 11 modules:
+The project is divided into the following 11 modules:
 
 | Module | Description |
 |---|---|
-| 01. STK–MATLAB Initialization | Establishes the connection between MATLAB and STK and initializes the simulation scenario. |
-| 02. Satellite Creation and Propagation | Creates three satellites and configures their orbital parameters and propagation. |
+| 01. STK–MATLAB Initialization | Establishes communication between MATLAB and STK and prepares the simulation scenario. |
+| 02. Satellite Creation and Propagation | Creates three satellites, defines their orbital parameters, and propagates their orbits. |
 | 03. Satellite Property Inspection | Retrieves and examines satellite properties and orbital information. |
-| 04. Satellite Geometry and Visibility | Determines satellite visibility, access intervals, and common visibility periods over the ground emitter location. |
-| 05. Satellite State Extraction | Extracts satellite position and velocity information at common observation epochs. |
-| 06. Emitter Geometry and RIC Transformation | Defines the ground emitter geometry, performs coordinate transformations, and calculates relative satellite-emitter geometry. |
-| 07. Synthetic TDOA/FDOA Generation | Generates synthetic TDOA and FDOA measurements with assumed Gaussian measurement noise. |
-| 08. Measurement Validation | Performs consistency checks on satellite states, geometric calculations, and generated measurements. |
-| 09. Cumulative Localization Solver | Estimates the emitter's latitude and longitude using cumulative TDOA and FDOA measurements. |
-| 10. Accuracy and Residual Analysis | Evaluates localization error, residual statistics, uncertainty, convergence, and sensitivity to initial guesses. |
-| 11. Monte Carlo Robustness Testing | Repeats localization simulations under different conditions to evaluate reliability and sensitivity to measurement and model uncertainties. |
+| 04. Satellite Geometry and Visibility | Determines satellite visibility, access intervals, and periods when all three satellites can observe the ground location simultaneously. |
+| 05. Satellite State Extraction | Extracts satellite position and velocity data at common observation epochs. |
+| 06. Emitter Geometry and RIC Transformation | Defines the ground emitter location, performs coordinate transformations, and calculates relative satellite-emitter geometry. |
+| 07. Synthetic TDOA/FDOA Generation | Generates synthetic TDOA and FDOA measurements and introduces assumed Gaussian measurement noise. |
+| 08. Measurement Validation | Checks the consistency of satellite states, geometric calculations, and generated measurements. |
+| 09. Cumulative Localization Solver | Uses successive TDOA and FDOA measurements to estimate the emitter's latitude and longitude. |
+| 10. Accuracy and Residual Analysis | Examines localization error, residual statistics, uncertainty estimates, convergence, and sensitivity to initial guesses. |
+| 11. Monte Carlo Robustness Testing | Repeats the localization process under different conditions to examine its reliability and sensitivity to measurement and model uncertainties. |
 
 ## Simulation Configuration
 
@@ -57,24 +57,22 @@ The current simulation uses the following configuration:
 
 ## Localization Approach
 
-The localization process uses TDOA and FDOA measurements derived from the relative positions and velocities of the satellites and the simulated ground emitter.
+The localization algorithm uses TDOA and FDOA measurements calculated from the relative positions and velocities of the satellites and the simulated ground emitter.
 
-The solver evaluates candidate emitter locations by predicting their corresponding TDOA and FDOA measurements and comparing them with the generated measurements.
+To estimate the emitter's location, the solver tests candidate geographical positions and calculates the TDOA and FDOA values expected at each location. It then compares these predicted measurements with the synthetic measurements generated by the simulation.
 
-An optimization process then refines the estimated latitude and longitude to minimize the measurement residuals.
-
-Measurements from successive observation epochs are accumulated to improve the localization estimate.
+An optimization process refines the candidate latitude and longitude by minimizing the differences between the predicted and measured values. As additional observation epochs become available, their measurements are added to the solution, allowing the algorithm to use information collected over a longer observation period.
 
 The current implementation estimates two geographical parameters:
 
 - Latitude
 - Longitude
 
-The emitter altitude is assumed to be known and fixed at 0.2 km.
+The emitter altitude is assumed to be known and remains fixed at 0.2 km throughout the localization process.
 
 ## Simulation Results
 
-The current simulation produced the following baseline results:
+The baseline localization run produced the following results:
 
 - **Single-run localization error:** Approximately 8.3 metres.
 - **Monte Carlo trials:** 100 per test case.
@@ -83,24 +81,32 @@ The current simulation produced the following baseline results:
 - **95% uncertainty coverage:** 95%.
 - **Formal covariance calibration:** Consistent with the empirical Monte Carlo results.
 
-Additional tests examined the effects of measurement noise, reference satellite selection, observation duration, satellite count, emitter position, assumed altitude error, and carrier-frequency mismatch.
-##Results and Analysis
-Module 10 – Accuracy and Residual Analysis
-The localization solver achieved a horizontal positioning error of approximately 8.3 metres in the simulated scenario using nine measurement epochs.
+Further tests were carried out to examine the effects of measurement noise, reference satellite selection, observation duration, satellite configuration, emitter location, assumed altitude error, and carrier-frequency mismatch.
 
-The residual analysis produced a chi-square per degree of freedom of 0.99, indicating consistency with the assumed measurement noise model. The solver also demonstrated improved convergence when additional measurement epochs were included, with the success rate increasing from 52% for one epoch to 93% for nine epochs across 69 initial guesses.
+## Results and Analysis
 
-These results demonstrate the benefit of accumulating measurements over time, although some sensitivity to initial guesses remains.
-Module 11 – Monte Carlo and Robustness Testing
-Monte Carlo simulations were conducted using 100 trials per test configuration to evaluate the system under different measurement noise levels, satellite geometries, reference satellite selections, and emitter locations.
+### Module 10 – Accuracy and Residual Analysis
 
-The analysis examined four main aspects:
-- Measurement noise: Localization error generally increased as TDOA and FDOA noise levels increased.
-- Covariance calibration: Compared empirical localization errors with the uncertainty predicted by the solver to evaluate uncertainty estimation.
-- Altitude sensitivity: Incorrect assumptions about emitter altitude affected horizontal localization accuracy.
-- Carrier frequency sensitivity: Carrier frequency mismatch influenced FDOA predictions and consequently affected localization performance.
+The accuracy assessment showed that the localization solver could estimate the simulated emitter's position with an error of approximately **8.3 metres** when using nine observation epochs.
 
-These results demonstrate the performance of the implemented localization framework under the simulated conditions and assumptions.
+The residual analysis produced a chi-square per degree of freedom of 0.99, which is consistent with the assumed measurement noise model. The analysis also showed that using measurements from additional observation epochs improved the solver's ability to converge towards the correct location.
+
+Across 69 different initial guesses, the solver achieved a success rate of 52% using a single epoch. When all nine epochs were included, the success rate increased to 93%. This demonstrates the benefit of accumulating measurements over time, although some sensitivity to the initial starting position remains.
+
+### Module 11 – Monte Carlo and Robustness Testing
+
+Monte Carlo simulations were performed using 100 trials for each test configuration. The purpose was to examine how changes in measurement conditions, satellite geometry, and model assumptions affect localization performance.
+
+The analysis covered four main areas:
+
+- **Measurement noise:** Localization error generally increased as the TDOA and FDOA noise levels increased, showing the effect of measurement uncertainty on the estimated position.
+- **Covariance calibration:** The empirical localization errors were compared with the uncertainty predicted by the solver to examine how well the uncertainty estimates represented the actual results.
+- **Altitude sensitivity:** Introducing errors in the assumed emitter altitude affected the horizontal localization accuracy, highlighting the importance of accurate altitude information.
+- **Carrier-frequency sensitivity:** Errors in the assumed carrier frequency affected the predicted FDOA measurements and, consequently, the localization results. The response was not necessarily monotonic across all tested error levels.
+
+Together, these tests provide an assessment of how the implemented localization framework performs under different simulated conditions. They also help identify which measurement and model parameters have a greater influence on the final position estimate.
+
+*Note: The results presented in this project are based on simulated satellite states and synthetic TDOA/FDOA measurements. They represent the performance of the implemented simulation framework and should not be interpreted as validation using real-world RF transmissions or receiver measurements.*
 
 ## Repository Structure
 
@@ -128,7 +134,7 @@ Automated-Satellite-Emitter-Localization/
 └── Figures/
 ```
 
-*The folder names above are a suggested organization; adjust them to match the actual repository files.*
+*The folder names shown above are a suggested organization. They can be adjusted to match the actual repository structure.*
 
 ## Requirements
 
@@ -136,37 +142,40 @@ Automated-Satellite-Emitter-Localization/
 - STK 11
 - MATLAB–STK COM connectivity on Windows
 - Optimization Toolbox for the `lsqnonlin` solver option, if used
-- Statistics and Machine Learning Toolbox is not required for the manual residual-correlation calculation.
+
+The manual residual-correlation calculation does not require the Statistics and Machine Learning Toolbox.
 
 ## How to Run
 
 1. Install MATLAB R2023b and STK 11.
-2. Open STK and establish the simulation environment.
-3. Open the project folder in MATLAB.
-4. Run the modules in numerical order, from Module 01 to Module 11.
-5. Ensure that the output files generated by each module are available to the subsequent modules.
-6. Review the generated CSV files, localization results, statistical summaries, and figures.
+2. Open the project folder in MATLAB.
+3. Ensure that STK is available and that MATLAB–STK COM connectivity is working.
+4. Run the modules in numerical order, starting with Module 01 and continuing through Module 11.
+5. Make sure the CSV files generated by each module are available before running the modules that depend on them.
+6. Review the generated localization results, CSV outputs, statistical summaries, and figures.
 
-**Note:** Some modules depend on outputs generated by earlier modules. They should therefore be executed in the correct sequence.
+**Note:** Each module builds on the outputs of earlier modules, so running them in the correct sequence is important.
 
 ## Future Research Directions
 
-Beyond its current application to satellite-based RF emitter localization, this framework provides a foundation for exploring other problems involving multi-observer measurements, signal analysis, and source localization.
+Although the current project focuses on satellite-based RF emitter localization, some of the computational methods explored here may also be relevant to other problems involving multiple observation points, signal analysis, and source localization.
 
-One potential research direction is investigating the mathematical and computational methods developed in this project in the context of **gravitational-wave astronomy**.
+One area of interest for future exploration is **gravitational-wave astronomy**.
 
-Gravitational-wave observatories, such as LIGO, Virgo, and KAGRA, use measurements from geographically separated detectors to study gravitational-wave signals and constrain the locations of their astrophysical sources.
+Gravitational-wave observatories such as LIGO, Virgo, and KAGRA use measurements from geographically separated detectors to study gravitational-wave signals and constrain the locations of their astrophysical sources.
 
-Some concepts explored in this project, particularly multi-observer geometry, measurement differences, uncertainty estimation, residual analysis, and localization optimization, may provide a useful starting point for studying related computational approaches in gravitational-wave source localization.
+Some of the concepts explored in this project, including multi-observer geometry, differences in measurement arrival times, uncertainty estimation, residual analysis, and localization optimization, provide a starting point for investigating related computational approaches in gravitational-wave source localization.
 
-Potential extensions include:
+Possible areas for further study include:
 
-- **Multi-detector source localization:** Exploring optimization and geometric methods for estimating source locations using measurements from multiple gravitational-wave detectors.
-- **Time-delay-based localization:** Studying the use of differences in gravitational-wave arrival times between detectors to constrain source directions.
-- **Signal analysis and parameter estimation:** Investigating computational techniques for extracting source information from noisy measurements.
-- **Uncertainty and robustness analysis:** Applying Monte Carlo simulations and statistical validation to assess the reliability of source-location estimates under different noise conditions.
-- **Cross-domain computational methods:** Exploring how optimization, numerical modelling, and multi-observer measurement techniques can be adapted across satellite-based localization and gravitational-wave data analysis.
+- **Multi-detector source localization:** Exploring geometric and optimization methods for estimating source directions using measurements from multiple gravitational-wave detectors.
+- **Time-delay-based localization:** Studying how differences in gravitational-wave arrival times between detectors can help constrain source locations.
+- **Signal analysis and parameter estimation:** Investigating computational techniques for extracting source information from noisy observations.
+- **Uncertainty and robustness analysis:** Applying Monte Carlo simulations and statistical methods to examine the reliability of localization estimates under different noise conditions.
+- **Cross-domain computational methods:** Exploring how numerical optimization, modelling, and multi-observer measurement techniques can be adapted to different source-localization problems.
+
+These are potential research directions rather than capabilities currently implemented in this project.
 
 ---
 
-**Technologies:** MATLAB | STK | TDOA | FDOA | Satellite Orbital Mechanics | Numerical Optimization | Monte Carlo Simulation
+**Technologies:** MATLAB | STK 11 | TDOA | FDOA | Satellite Orbital Mechanics | Numerical Optimization | Monte Carlo Simulation
